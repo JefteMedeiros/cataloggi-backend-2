@@ -1,0 +1,6 @@
+@cataloggi_backend_2_HostAddress = http://localhost:5012
+
+GET {{cataloggi_backend_2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
