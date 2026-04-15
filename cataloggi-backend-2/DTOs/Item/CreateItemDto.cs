@@ -2,7 +2,7 @@
 
 public class CreateItemDto
 {
-    public int CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
 }
