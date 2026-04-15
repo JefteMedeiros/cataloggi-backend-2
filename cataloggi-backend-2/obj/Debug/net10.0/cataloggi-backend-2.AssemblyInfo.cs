@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("cataloggi-backend-2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+23bf1c9ed65221710cc554dbbedd98c979ae9475")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b51bae17d4103025fc9f3036788859fe2e94bfe6")]
 [assembly: System.Reflection.AssemblyProductAttribute("cataloggi-backend-2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("cataloggi-backend-2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
