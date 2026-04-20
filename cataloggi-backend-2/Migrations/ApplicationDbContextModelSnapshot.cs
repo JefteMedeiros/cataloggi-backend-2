@@ -25,10 +25,10 @@ namespace cataloggi_backend_2.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
+                    b.Property<Guid>("Slug")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
