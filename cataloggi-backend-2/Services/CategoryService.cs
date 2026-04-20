@@ -1,4 +1,5 @@
 ﻿using cataloggi_backend_2.DTOs.Category;
+using cataloggi_backend_2.Exceptions;
 using cataloggi_backend_2.Models;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services.Interfaces;
@@ -14,13 +15,10 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
         return categories.Select(MapToDto).ToList();
     }
 
-    public async Task<CategoryDto?> GetCategory(Guid id)
+    public async Task<CategoryDto> GetCategory(Guid id)
     {
         var category = await categoryRepository.GetCategory(id);
-
-        if (category is null) return null;
-
-        return MapToDto(category);
+        return MapToDto(category ?? throw new NotFoundException("Category not found"));
     }
 
     public async Task<CategoryDto> CreateCategory(CreateCategoryDto categoryDto)
@@ -29,7 +27,7 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
         {
             Id = Guid.NewGuid(),
             Name = categoryDto.Name,
-            Slug = Guid.NewGuid().ToString()
+            Slug = Guid.NewGuid(),
         };
         
         var createdCategory = await categoryRepository.CreateCategory(category);
@@ -37,11 +35,15 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
         return MapToDto(createdCategory);
     }
 
-    public async Task<CategoryDto?> UpdateCategory(Guid id, UpdateCategoryDto categoryDto)
+    public async Task<CategoryDto> UpdateCategory(Guid id, UpdateCategoryDto categoryDto)
     {
         var categoryToEdit = await categoryRepository.GetCategory(id);
 
-        if (categoryToEdit is null) return null;
+        if (categoryToEdit is null)
+            throw new NotFoundException("Category not found");
+
+        if (categoryToEdit.Name.Equals(categoryDto.Name, StringComparison.InvariantCultureIgnoreCase))
+            throw new ConflictException("Category name must be different from the current name");
 
         categoryToEdit.Name = categoryDto.Name;
         
@@ -49,15 +51,14 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
         return MapToDto(categoryToEdit);
     }
 
-    public async Task<bool> DeleteCategory(Guid id)
+    public async Task DeleteCategory(Guid id)
     {
         var categoryToDelete = await categoryRepository.GetCategory(id);
 
         if (categoryToDelete is null)
-            return false;
+            throw new NotFoundException("Category not found");
         
         await categoryRepository.DeleteCategory(categoryToDelete);
-        return true;
     }
     
     private static CategoryDto MapToDto(Category category)
