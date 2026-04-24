@@ -24,7 +24,7 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
         return category;
     }
 
-    public async Task UpdateAsync(Category category)
+    public async Task UpdateCategory(Category category)
     {
         context.Categories.Update(category);
         await context.SaveChangesAsync();

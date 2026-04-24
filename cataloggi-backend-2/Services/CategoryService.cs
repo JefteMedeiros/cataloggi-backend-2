@@ -47,7 +47,7 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
 
         categoryToEdit.Name = categoryDto.Name;
         
-        await categoryRepository.UpdateAsync(categoryToEdit);
+        await categoryRepository.UpdateCategory(categoryToEdit);
         return MapToDto(categoryToEdit);
     }
 
