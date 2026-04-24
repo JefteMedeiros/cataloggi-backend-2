@@ -4,6 +4,7 @@ using cataloggi_backend_2.Repositories;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services;
 using cataloggi_backend_2.Services.Interfaces;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,27 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("GlobalExceptionHandler");
+
+        if (exception is not null)
+            logger.LogError(exception, "An unhandled exception occurred.");
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = "An unexpected error occurred."
+        });
+    });
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
