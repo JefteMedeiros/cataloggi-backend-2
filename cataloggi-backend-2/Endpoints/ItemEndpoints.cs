@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using cataloggi_backend_2.DTOs;
 using cataloggi_backend_2.Exceptions;
+using cataloggi_backend_2.RateLimiting;
 using cataloggi_backend_2.Services.Interfaces;
 
 namespace cataloggi_backend_2.Endpoints;
@@ -15,7 +16,8 @@ public static class ItemEndpoints
         {
             var items = await itemService.GetItems();
             return Results.Ok(items);
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapGet("/{id:guid}", async (Guid id, IItemService itemService) =>
         {
@@ -28,14 +30,16 @@ public static class ItemEndpoints
             {
                 return Results.NotFound(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapGet("/summaries", async (IItemService itemService) =>
         {
             var itemSummaries = await itemService.GetItemSummaries();
 
             return Results.Ok(itemSummaries);
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapPost("/", async (CreateItemDto? dto, IItemService itemService) =>
         {
@@ -54,7 +58,8 @@ public static class ItemEndpoints
             var createdItem = await itemService.CreateItem((dto));
             
             return Results.Created($"/api/items/{createdItem.Id}", createdItem);
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
 
         group.MapPut("/{id:guid}", async (Guid id, UpdateItemDto? dto, IItemService itemService) =>
         {
@@ -83,7 +88,8 @@ public static class ItemEndpoints
             {
                 return Results.Conflict(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
 
         group.MapDelete("/{id:guid}", async (Guid id, IItemService itemService) =>
         {
@@ -96,6 +102,7 @@ public static class ItemEndpoints
             {
                 return Results.NotFound(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
     }
 }

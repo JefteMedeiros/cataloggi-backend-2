@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using cataloggi_backend_2.DTOs.Category;
 using cataloggi_backend_2.Exceptions;
+using cataloggi_backend_2.RateLimiting;
 using cataloggi_backend_2.Services.Interfaces;
 
 namespace cataloggi_backend_2.Endpoints;
@@ -15,7 +16,8 @@ public static class CategoryEndpoints
         {
             var categories = await categoryService.GetCategories();
             return Results.Ok(categories);
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapGet("/{id:guid}", async (Guid id, ICategoryService categoryService) =>
         {
@@ -28,7 +30,8 @@ public static class CategoryEndpoints
             {
                 return Results.NotFound(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapPost("/", async (CreateCategoryDto? dto, ICategoryService categoryService) =>
         {
@@ -46,7 +49,8 @@ public static class CategoryEndpoints
             
             var createdCategory = await categoryService.CreateCategory(dto);
             return Results.Created($"/api/categories/{createdCategory.Id}", createdCategory);
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
 
         group.MapPut("/{id:guid}", async (Guid id, UpdateCategoryDto? dto, ICategoryService categoryService) =>
         {
@@ -75,7 +79,8 @@ public static class CategoryEndpoints
             {
                 return Results.Conflict(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
 
         group.MapDelete("/{id:guid}", async (Guid id, ICategoryService categoryService) =>
         {
@@ -88,6 +93,7 @@ public static class CategoryEndpoints
             {
                 return Results.NotFound(new { message = ex.Message });
             }
-        });
+        })
+        .RequireRateLimiting(RateLimitPolicies.Write);
     }
 }

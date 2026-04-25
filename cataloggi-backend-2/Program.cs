@@ -1,9 +1,11 @@
 using cataloggi_backend_2.AppDbContext;
 using cataloggi_backend_2.Endpoints;
+using cataloggi_backend_2.RateLimiting;
 using cataloggi_backend_2.Repositories;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services;
 using cataloggi_backend_2.Services.Interfaces;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +18,37 @@ var connectionString =
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
-
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy(RateLimitPolicies.Read, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientIp(httpContext),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 120,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy(RateLimitPolicies.Write, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientIp(httpContext),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -56,8 +84,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 
 app.MapCategoryEndpoints();
 app.MapItemEndpoints();
 
 app.Run();
+
+static string GetClientIp(HttpContext httpContext)
+{
+    return httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+}
