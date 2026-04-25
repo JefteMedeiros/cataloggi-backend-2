@@ -30,6 +30,13 @@ public static class ItemEndpoints
             }
         });
 
+        group.MapGet("/summaries", async (IItemService itemService) =>
+        {
+            var itemSummaries = await itemService.GetItemSummaries();
+
+            return Results.Ok(itemSummaries);
+        });
+
         group.MapPost("/", async (CreateItemDto? dto, IItemService itemService) =>
         {
             if (dto is null)

@@ -15,6 +15,13 @@ public class ItemService(IItemRepository itemRepository) : IItemService
         return items.Select(MapToDto).ToList();
     }
 
+    public async Task<List<ItemSummaryDto>> GetItemSummaries()
+    {
+        var items = await itemRepository.GetItems();
+        
+        return items.Select(MapToSummaryDto).ToList();
+    }
+
     public async Task<ItemDto> GetItem(Guid id)
     {
         var item = await itemRepository.GetItem(id);
@@ -80,6 +87,18 @@ public class ItemService(IItemRepository itemRepository) : IItemService
             throw new ConflictException("Item name cannot be empty.");
 
         return name.Trim()[0].ToString().ToUpperInvariant();
+    }
+
+    private static ItemSummaryDto MapToSummaryDto(Item item)
+    {
+        return new ItemSummaryDto
+        {
+            Id = item.Id,
+            CategoryId = item.CategoryId,
+            Name = item.Name,
+            FirstLetter = item.FirstLetter,
+            UpdatedAt = item.UpdatedAt
+        };
     }
     
     private static ItemDto MapToDto(Item item)
