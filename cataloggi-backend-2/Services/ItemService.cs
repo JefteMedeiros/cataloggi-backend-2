@@ -6,7 +6,7 @@ using cataloggi_backend_2.Services.Interfaces;
 
 namespace cataloggi_backend_2.Services;
 
-public class ItemService(IItemRepository itemRepository) : IItemService
+public class ItemService(IItemRepository itemRepository, ICategoryRepository categoryRepository) : IItemService
 {
     public async Task<List<ItemDto>> GetItems()
     {
@@ -31,6 +31,8 @@ public class ItemService(IItemRepository itemRepository) : IItemService
 
     public async Task<ItemDto> CreateItem(CreateItemDto itemDto)
     {
+        await EnsureCategoryExists(itemDto.CategoryId);
+
         var name = itemDto.Name.Trim();
         
         var item = new Item
@@ -53,6 +55,8 @@ public class ItemService(IItemRepository itemRepository) : IItemService
         
         if (itemToEdit is null)
             throw new NotFoundException("The requested item was not found.");
+
+        await EnsureCategoryExists(itemDto.CategoryId);
 
         var name = itemDto.Name.Trim();
         
@@ -87,6 +91,14 @@ public class ItemService(IItemRepository itemRepository) : IItemService
             throw new ConflictException("Item name cannot be empty.");
 
         return name.Trim()[0].ToString().ToUpperInvariant();
+    }
+
+    private async Task EnsureCategoryExists(Guid categoryId)
+    {
+        var category = await categoryRepository.GetCategory(categoryId);
+
+        if (category is null)
+            throw new BadRequestException("CategoryId does not reference an existing category.");
     }
 
     private static ItemSummaryDto MapToSummaryDto(Item item)

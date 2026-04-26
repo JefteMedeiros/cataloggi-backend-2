@@ -41,7 +41,7 @@ public static class ItemEndpoints
         })
         .RequireRateLimiting(RateLimitPolicies.Read);
 
-        group.MapPost("/", async (CreateItemDto? dto, IItemService itemService) =>
+        group.MapPost("/", async (CreateItemRequestDto? dto, IItemService itemService) =>
         {
             if (dto is null)
                 return Results.BadRequest(new { errors = new[] { "Request body is required" } });
@@ -54,14 +54,27 @@ public static class ItemEndpoints
                 var errors = validationResults.Select(x => x.ErrorMessage);
                 return Results.BadRequest(new { errors });
             }
+
+            var itemDto = new CreateItemDto
+            {
+                CategoryId = Guid.Parse(dto.CategoryId!),
+                Name = dto.Name,
+                Content = dto.Content
+            };
             
-            var createdItem = await itemService.CreateItem((dto));
-            
-            return Results.Created($"/api/items/{createdItem.Id}", createdItem);
+            try
+            {
+                var createdItem = await itemService.CreateItem(itemDto);
+                return Results.Created($"/api/items/{createdItem.Id}", createdItem);
+            }
+            catch (BadRequestException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
         })
         .RequireRateLimiting(RateLimitPolicies.Write);
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateItemDto? dto, IItemService itemService) =>
+        group.MapPut("/{id:guid}", async (Guid id, UpdateItemRequestDto? dto, IItemService itemService) =>
         {
             if (dto is null)
                 return Results.BadRequest(new { errors = new[] { "Request body is required" } });
@@ -75,14 +88,25 @@ public static class ItemEndpoints
                 return Results.BadRequest(new { errors });
             }
 
+            var itemDto = new UpdateItemDto
+            {
+                CategoryId = Guid.Parse(dto.CategoryId!),
+                Name = dto.Name,
+                Content = dto.Content
+            };
+
             try
             {
-                var updated = await itemService.UpdateItem(id, dto);
+                var updated = await itemService.UpdateItem(id, itemDto);
                 return Results.Ok(updated);
             }
             catch (NotFoundException ex)
             {
                 return Results.NotFound(new { message = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
             }
             catch (ConflictException ex)
             {
