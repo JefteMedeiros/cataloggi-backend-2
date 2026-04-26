@@ -12,4 +12,19 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Item> Items => Set<Item>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Category>()
+            .Property(category => category.Name)
+            .UseCollation("NOCASE");
+
+        modelBuilder.Entity<Category>()
+            .HasIndex(category => category.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<Category>()
+            .HasIndex(category => category.Slug)
+            .IsUnique();
+    }
 }

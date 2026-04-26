@@ -1,50 +1,45 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository is a .NET solution with one API project:
-- `cataloggi-backend-2.sln`: solution entry point.
-- `cataloggi-backend-2/Program.cs`: app startup and dependency wiring.
-- `cataloggi-backend-2/AppDbContext/`: Entity Framework Core `DbContext`.
-- `cataloggi-backend-2/Models/`: domain entities (`Item`, `Category`).
-- `cataloggi-backend-2/DTOs/`: request/response DTOs grouped by feature.
-- `cataloggi-backend-2/appsettings*.json`: environment-specific configuration.
+This repository contains a single .NET API solution.
 
-Keep new feature files grouped by concern (for example `DTOs/Order/` and `Models/Order.cs`).
+- `cataloggi-backend-2.sln`: solution entry point.
+- `cataloggi-backend-2/Program.cs`: application startup, middleware, and dependency registration.
+- `cataloggi-backend-2/Endpoints/`: minimal API endpoint definitions by feature.
+- `cataloggi-backend-2/Services/`: business logic.
+- `cataloggi-backend-2/Repositories/`: data access abstractions and EF Core persistence.
+- `cataloggi-backend-2/Data/AppDbContext.cs`: EF Core database context.
+- `cataloggi-backend-2/Models/`: domain entities such as `Category` and `Item`.
+- `cataloggi-backend-2/DTOs/`: request and response DTOs grouped by feature.
+- `cataloggi-backend-2/Migrations/`: EF Core migrations.
+
+Add new feature code in the same layered style: endpoint, service, repository, model, and DTO files grouped by concern.
 
 ## Build, Test, and Development Commands
-Run commands from repository root unless noted.
-- `dotnet restore cataloggi-backend-2.sln`: restore NuGet packages.
-- `dotnet build cataloggi-backend-2.sln -c Release`: compile solution.
-- `dotnet run --project .\cataloggi-backend-2\cataloggi-backend-2.csproj`: start API locally.
-- `dotnet watch --project .\cataloggi-backend-2\cataloggi-backend-2.csproj run`: run with hot reload.
-- `dotnet test`: run tests (currently no test project in this checkout).
+Run commands from the repository root.
+
+- `dotnet restore cataloggi-backend-2.sln`: restore NuGet dependencies.
+- `dotnet build cataloggi-backend-2.sln -c Release`: compile the solution in Release mode.
+- `dotnet run --project cataloggi-backend-2/cataloggi-backend-2.csproj`: start the API locally.
+- `dotnet watch --project cataloggi-backend-2/cataloggi-backend-2.csproj run`: run with hot reload during development.
+- `dotnet test`: run tests when a test project is present.
+
+Use `cataloggi-backend-2/cataloggi-backend-2.http` for local API request examples.
 
 ## Coding Style & Naming Conventions
-- Use C# defaults: 4-space indentation, UTF-8, nullable reference types enabled.
-- Use `PascalCase` for classes, methods, and public properties.
-- Use `camelCase` for local variables and parameters.
-- Keep DTO names explicit: `CreateXDto`, `UpdateXDto`, `XDto`, `XSummaryDto`.
-- Keep startup registration in `Program.cs`; move feature logic to dedicated files/folders.
+Use standard C# conventions: 4-space indentation, nullable-aware code, `PascalCase` for public types and members, and `camelCase` for locals and parameters.
+
+Keep names explicit and feature-oriented. Examples: `CreateItemDto`, `UpdateCategoryDto`, `ItemSummaryDto`, `IItemRepository`, `CategoryService`. Keep dependency registration centralized in `Program.cs`; place feature behavior in dedicated files.
 
 ## Testing Guidelines
-There is no test project yet. Add tests under a top-level `tests/` directory (for example `tests/Cataloggi.Backend.Tests`).
-- Preferred stack: `xUnit` + `FluentAssertions`.
-- Name files as `<ClassName>Tests.cs`.
-- Name test methods as `MethodName_ShouldExpectedBehavior_WhenCondition`.
-- Run all tests with `dotnet test` before opening a PR.
+There is currently no test project. Add tests under `tests/`, for example `tests/Cataloggi.Backend.Tests`.
+
+Preferred stack: xUnit and FluentAssertions. Name test files `<ClassName>Tests.cs` and test methods `MethodName_ShouldExpectedBehavior_WhenCondition`. Run `dotnet test` before opening a pull request. For API changes, include representative request examples or test coverage for validation, success, and error paths.
 
 ## Commit & Pull Request Guidelines
-Git history is not available in this exported workspace, so follow Conventional Commits:
-- `feat: add item filtering endpoint`
-- `fix: validate category id on create item`
+Git history follows Conventional Commit-style messages, such as `feat: item summaries endpoint` and `chore: stronger dto validation`. Use concise prefixes like `feat:`, `fix:`, `chore:`, and `refactor:`.
 
-For PRs, include:
-- concise summary of behavior changes,
-- linked issue (`Closes #123`) when applicable,
-- test evidence (`dotnet test` output or API call examples),
-- config or migration notes if data model/config changed.
+Pull requests should include a short behavior summary, linked issue when applicable, test evidence, and any migration or configuration notes. Include API examples when endpoint behavior changes.
 
 ## Security & Configuration Tips
-- Never commit secrets in `appsettings*.json`.
-- Keep connection strings in environment-specific settings or user secrets.
-- Validate all incoming DTOs before persistence.
+Do not commit secrets in `appsettings*.json`. Keep connection strings and credentials in user secrets, environment variables, or deployment-specific configuration. Validate incoming DTOs before persistence, and avoid committing generated local database files.

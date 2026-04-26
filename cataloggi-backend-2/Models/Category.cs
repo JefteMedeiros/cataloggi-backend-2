@@ -11,5 +11,6 @@ public class Category
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public Guid Slug { get; set; }
+    [StringLength(96, MinimumLength = 1)]
+    public string Slug { get; set; } = string.Empty;
 }
