@@ -11,16 +11,14 @@ public static class CategoryEndpoints
     public static void MapCategoryEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/categories")
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .WithTags("Categories");
 
         async Task<IResult> GetCategories(ICategoryService categoryService)
         {
             var categories = await categoryService.GetCategories();
             return Results.Ok(categories);
         }
-
-        group.MapGet("", GetCategories)
-        .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapGet("/", GetCategories)
         .RequireRateLimiting(RateLimitPolicies.Read);

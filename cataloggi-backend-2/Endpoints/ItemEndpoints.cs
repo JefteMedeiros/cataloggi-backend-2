@@ -11,7 +11,8 @@ public static class ItemEndpoints
     public static void MapItemEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/items")
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .WithTags("Items");
 
         group.MapGet("/", async (IItemService itemService) =>
         {
