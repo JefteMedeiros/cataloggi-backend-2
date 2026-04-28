@@ -10,13 +10,19 @@ public static class CategoryEndpoints
 {
     public static void MapCategoryEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/categories");
+        var group = app.MapGroup("/api/categories")
+            .RequireAuthorization();
 
-        group.MapGet("/", async (ICategoryService categoryService) =>
+        async Task<IResult> GetCategories(ICategoryService categoryService)
         {
             var categories = await categoryService.GetCategories();
             return Results.Ok(categories);
-        })
+        }
+
+        group.MapGet("", GetCategories)
+        .RequireRateLimiting(RateLimitPolicies.Read);
+
+        group.MapGet("/", GetCategories)
         .RequireRateLimiting(RateLimitPolicies.Read);
 
         group.MapGet("/{id:guid}", async (Guid id, ICategoryService categoryService) =>

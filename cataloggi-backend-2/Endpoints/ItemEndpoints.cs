@@ -10,7 +10,8 @@ public static class ItemEndpoints
 {
     public static void MapItemEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/items");
+        var group = app.MapGroup("/api/items")
+            .RequireAuthorization();
 
         group.MapGet("/", async (IItemService itemService) =>
         {
