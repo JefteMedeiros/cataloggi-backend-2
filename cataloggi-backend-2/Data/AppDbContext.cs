@@ -16,10 +16,6 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>()
-            .Property(category => category.Name)
-            .UseCollation("NOCASE");
-
-        modelBuilder.Entity<Category>()
             .HasIndex(category => category.Name)
             .IsUnique();
 
