@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: cataloggi-postgres
+    environment:
+      POSTGRES_USER: cataloggi
+      POSTGRES_PASSWORD: cataloggi_dev_password
+      POSTGRES_DB: cataloggi_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - cataloggi_pgdata:/var/lib/postgresql
+    restart: unless-stopped
+
+volumes:
+  cataloggi_pgdata:
