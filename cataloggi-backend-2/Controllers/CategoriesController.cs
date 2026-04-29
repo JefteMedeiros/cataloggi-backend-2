@@ -46,7 +46,12 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         }
     }
 
-    
+    [HttpPost]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
+    [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto dto)
     {
         var createdCategory = await categoryService.CreateCategory(dto);
