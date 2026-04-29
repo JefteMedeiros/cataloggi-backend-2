@@ -1,5 +1,4 @@
 using cataloggi_backend_2.AppDbContext;
-using cataloggi_backend_2.Endpoints;
 using cataloggi_backend_2.RateLimiting;
 using cataloggi_backend_2.Repositories;
 using cataloggi_backend_2.Repositories.Interfaces;
@@ -28,6 +27,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddControllers();
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
 
 var authOptions = builder.Configuration
@@ -127,9 +127,7 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapAuthEndpoints();
-app.MapCategoryEndpoints();
-app.MapItemEndpoints();
+app.MapControllers();
 
 app.Run();
 
