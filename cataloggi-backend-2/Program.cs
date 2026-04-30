@@ -16,6 +16,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
+const string CorsPolicyName = "ConfiguredOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, _, loggerConfiguration) =>
@@ -55,6 +57,18 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(AuthOptions.SectionName));
+builder.Services.AddCors(options =>
+{
+    var allowedOrigins = GetConfiguredOrigins(builder.Configuration["Cors:AllowedOrigins"]);
+
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var authOptions = builder.Configuration
     .GetSection(AuthOptions.SectionName)
@@ -154,6 +168,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseRateLimiter();
+app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -169,4 +184,11 @@ app.Run();
 static string GetClientIp(HttpContext httpContext)
 {
     return httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+}
+
+static string[] GetConfiguredOrigins(string? configuredOrigins)
+{
+    return configuredOrigins?
+        .Split([',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        ?? [];
 }
