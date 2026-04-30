@@ -131,6 +131,11 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }))
+    .AllowAnonymous()
+    .WithTags("Health")
+    .Produces(StatusCodes.Status200OK);
+
 app.MapControllers();
 
 app.Run();
