@@ -12,8 +12,33 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, _, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", builder.Environment.ApplicationName)
+        .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName);
+
+    var applicationInsightsConnectionString =
+        context.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+
+    if (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))
+    {
+        loggerConfiguration.WriteTo.ApplicationInsights(
+            applicationInsightsConnectionString,
+            TelemetryConverter.Traces);
+    }
+});
 
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
@@ -127,6 +152,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
