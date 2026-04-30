@@ -18,8 +18,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [HttpGet]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(IEnumerable<ItemDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
     {
         var items = await itemService.GetItems();
@@ -29,8 +29,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [HttpGet("summaries")]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(IEnumerable<ItemSummaryDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<IEnumerable<ItemSummaryDto>>> GetItemSummaries()
     {
         var itemSummaries = await itemService.GetItemSummaries();
@@ -41,8 +41,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<ItemDto>> GetItem(Guid id)
     {
         try
@@ -60,8 +60,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<ItemDto>> CreateItem(CreateItemRequestDto dto)
     {
         var itemDto = new CreateItemDto
@@ -78,7 +78,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
         }
         catch (BadRequestException ex)
         {
-            return BadRequest(new ErrorResponseDto { Message = ex.Message });
+            ModelState.AddModelError(nameof(dto.CategoryId), ex.Message);
+            return ValidationProblem(ModelState);
         }
     }
 
@@ -88,8 +89,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<ItemDto>> UpdateItem(Guid id, UpdateItemRequestDto dto)
     {
         var itemDto = new UpdateItemDto
@@ -110,7 +111,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
         }
         catch (BadRequestException ex)
         {
-            return BadRequest(new ErrorResponseDto { Message = ex.Message });
+            ModelState.AddModelError(nameof(dto.CategoryId), ex.Message);
+            return ValidationProblem(ModelState);
         }
         catch (ConflictException ex)
         {
@@ -122,8 +124,8 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> DeleteItem(Guid id)
     {
         try

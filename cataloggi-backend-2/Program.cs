@@ -4,6 +4,7 @@ using cataloggi_backend_2.Repositories;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services;
 using cataloggi_backend_2.Services.Interfaces;
+using cataloggi_backend_2.Swagger;
 using System.Threading.RateLimiting;
 using System.Text;
 using cataloggi_backend_2.Options;
@@ -85,7 +86,10 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<SwaggerResponseExamplesOperationFilter>();
+});
 
 var app = builder.Build();
 

@@ -18,8 +18,8 @@ public class AuthController(IAuthService authService) : ControllerBase
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public ActionResult<LoginResponseDto> Login(LoginRequestDto dto)
     {
         var response = authService.Login(dto);
