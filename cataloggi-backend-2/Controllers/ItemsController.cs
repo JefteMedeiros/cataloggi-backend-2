@@ -16,9 +16,9 @@ namespace cataloggi_backend_2.Controllers;
 public class ItemsController(IItemService itemService) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<ItemDto>>> 
         GetItems([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
@@ -28,9 +28,9 @@ public class ItemsController(IItemService itemService) : ControllerBase
     }
 
     [HttpGet("summaries")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemSummaryDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<ItemSummaryDto>>> 
         GetItemSummaries([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
@@ -41,10 +41,10 @@ public class ItemsController(IItemService itemService) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<ItemDto>> GetItem(Guid id)
     {

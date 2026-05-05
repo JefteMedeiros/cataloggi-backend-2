@@ -17,9 +17,9 @@ namespace cataloggi_backend_2.Controllers;
 public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<CategoryDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<CategoryDto>>> 
         GetCategories([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
@@ -30,10 +30,10 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<CategoryDto>> GetCategory(Guid id)
     {
