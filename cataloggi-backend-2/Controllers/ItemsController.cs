@@ -17,23 +17,26 @@ public class ItemsController(IItemService itemService) : ControllerBase
 {
     [HttpGet]
     [EnableRateLimiting(RateLimitPolicies.Read)]
-    [ProducesResponseType(typeof(IEnumerable<ItemDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedResponseDto<ItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
+    public async Task<ActionResult<PaginatedResponseDto<ItemDto>>> 
+        GetItems([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
     {
-        var items = await itemService.GetItems();
+        var items = await itemService.GetItems(page, pageSize);
         return Ok(items);
     }
 
     [HttpGet("summaries")]
     [EnableRateLimiting(RateLimitPolicies.Read)]
-    [ProducesResponseType(typeof(IEnumerable<ItemSummaryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedResponseDto<ItemSummaryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<IEnumerable<ItemSummaryDto>>> GetItemSummaries()
+    public async Task<ActionResult<PaginatedResponseDto<ItemSummaryDto>>> 
+        GetItemSummaries([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
     {
-        var itemSummaries = await itemService.GetItemSummaries();
+        var itemSummaries = await itemService
+            .GetItemSummaries(page, pageSize);
         return Ok(itemSummaries);
     }
 

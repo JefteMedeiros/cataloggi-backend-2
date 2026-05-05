@@ -7,9 +7,18 @@ namespace cataloggi_backend_2.Repositories;
 
 public class ItemRepository(ApplicationDbContext context): IItemRepository
 {
-    public async Task<List<Item>> GetItems()
+    public async Task<List<Item>> GetItems(int page, int pageSize)
     {
-        return await context.Items.ToListAsync();
+        return await context.Items
+            .OrderBy(i => i.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountItems()
+    {
+        return await context.Items.CountAsync();
     }
     
     public async Task<Item?> GetItem(Guid id)

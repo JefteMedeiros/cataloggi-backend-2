@@ -7,9 +7,18 @@ namespace cataloggi_backend_2.Repositories;
 
 public class CategoryRepository(ApplicationDbContext context) : ICategoryRepository
 {
-    public async Task<List<Category>> GetCategories()
+    public async Task<List<Category>> GetCategories(int page, int pageSize)
     {
-        return await context.Categories.ToListAsync();
+        return await context.Categories
+            .OrderBy(c => c.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountCategories()
+    {
+        return await context.Categories.CountAsync();
     }
     
     public async Task<Category?> GetCategory(Guid id)

@@ -8,18 +8,40 @@ namespace cataloggi_backend_2.Services;
 
 public class ItemService(IItemRepository itemRepository, ICategoryRepository categoryRepository) : IItemService
 {
-    public async Task<List<ItemDto>> GetItems()
+    public async Task<PaginatedResponseDto<ItemDto>> GetItems(int page, int pageSize)
     {
-        var items = await itemRepository.GetItems();
-        
-        return items.Select(MapToDto).ToList();
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var items = await itemRepository.GetItems(page, pageSize);
+        var totalItems = await itemRepository.CountItems();
+
+        return new PaginatedResponseDto<ItemDto>
+        {
+            Items = items.Select(MapToDto).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+        };
     }
 
-    public async Task<List<ItemSummaryDto>> GetItemSummaries()
+    public async Task<PaginatedResponseDto<ItemSummaryDto>> GetItemSummaries(int page, int pageSize)
     {
-        var items = await itemRepository.GetItems();
-        
-        return items.Select(MapToSummaryDto).ToList();
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var items = await itemRepository.GetItems(page, pageSize);
+        var totalItems = await itemRepository.CountItems();
+
+        return new PaginatedResponseDto<ItemSummaryDto>
+        {
+            Items = items.Select(MapToSummaryDto).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+        };
     }
 
     public async Task<ItemDto> GetItem(Guid id)

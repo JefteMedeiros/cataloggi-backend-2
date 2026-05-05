@@ -1,10 +1,11 @@
-﻿using cataloggi_backend_2.DTOs.Category;
+﻿using cataloggi_backend_2.DTOs;
+using cataloggi_backend_2.DTOs.Category;
 
 namespace cataloggi_backend_2.Services.Interfaces;
 
 public interface ICategoryService
 {
-    Task<List<CategoryDto>> GetCategories();
+    Task<PaginatedResponseDto<CategoryDto>> GetCategories(int page, int pageSize);
     Task<CategoryDto> GetCategory(Guid id);
     Task<CategoryDto> CreateCategory(CreateCategoryDto category);
     Task<CategoryDto> UpdateCategory(Guid id, UpdateCategoryDto category);

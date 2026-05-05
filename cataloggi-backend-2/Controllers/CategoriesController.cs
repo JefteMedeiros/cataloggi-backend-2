@@ -18,12 +18,14 @@ public class CategoriesController(ICategoryService categoryService) : Controller
 {
     [HttpGet]
     [EnableRateLimiting(RateLimitPolicies.Read)]
-    [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedResponseDto<CategoryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
+    public async Task<ActionResult<PaginatedResponseDto<CategoryDto>>> 
+        GetCategories([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var categories = await categoryService.GetCategories();
+        var categories = await 
+            categoryService.GetCategories(page, pageSize);
         return Ok(categories);
     }
 

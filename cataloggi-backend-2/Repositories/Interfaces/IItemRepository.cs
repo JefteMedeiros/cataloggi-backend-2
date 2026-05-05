@@ -4,7 +4,8 @@ namespace cataloggi_backend_2.Repositories.Interfaces;
 
 public interface IItemRepository
 {
-    Task<List<Item>> GetItems();
+    Task<List<Item>> GetItems(int page, int pageSize);
+    Task<int> CountItems();
     Task<Item?> GetItem(Guid id);
     Task<Item> CreateItem(Item item);
     Task UpdateItem(Item item);
