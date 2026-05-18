@@ -149,7 +149,11 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+}
+
+if (app.Environment.IsDevelopment()
+    || builder.Configuration.GetValue<bool>("Database:RunMigrationsOnStartup"))
+{
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
