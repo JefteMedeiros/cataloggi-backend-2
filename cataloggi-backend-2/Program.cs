@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 const string CorsPolicyName = "ConfiguredOrigins";
 
@@ -29,17 +28,8 @@ builder.Host.UseSerilog((context, _, loggerConfiguration) =>
         .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", builder.Environment.ApplicationName)
-        .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName);
-
-    var applicationInsightsConnectionString =
-        context.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
-
-    if (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))
-    {
-        loggerConfiguration.WriteTo.ApplicationInsights(
-            applicationInsightsConnectionString,
-            TelemetryConverter.Traces);
-    }
+        .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
+        .WriteTo.Console();
 });
 
 var connectionString =
