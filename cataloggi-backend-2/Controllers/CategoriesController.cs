@@ -22,10 +22,10 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     [ProducesResponseType(typeof(PaginatedResponseDto<CategoryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<CategoryDto>>> 
-        GetCategories([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        GetCategories([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "")
     {
         var categories = await 
-            categoryService.GetCategories(page, pageSize);
+            categoryService.GetCategories(page, pageSize, search);
         return Ok(categories);
     }
 

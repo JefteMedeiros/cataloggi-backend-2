@@ -7,18 +7,34 @@ namespace cataloggi_backend_2.Repositories;
 
 public class CategoryRepository(ApplicationDbContext context) : ICategoryRepository
 {
-    public async Task<List<Category>> GetCategories(int page, int pageSize)
+    public async Task<List<Category>> GetCategories(int page, int pageSize, string search)
     {
-        return await context.Categories
+        var query = context.Categories.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.ToLower();
+            query = query.Where(c => c.Name.ToLower().Contains(normalizedSearch));
+        }
+
+        return await query
             .OrderBy(c => c.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
     }
 
-    public async Task<int> CountCategories()
+    public async Task<int> CountCategories(string search)
     {
-        return await context.Categories.CountAsync();
+        var query = context.Categories.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.ToLower();
+            query = query.Where(c => c.Name.ToLower().Contains(normalizedSearch));
+        }
+
+        return await query.CountAsync();
     }
     
     public async Task<Category?> GetCategory(Guid id)

@@ -21,9 +21,9 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<ItemDto>>> 
-        GetItems([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
+        GetItems([FromQuery]int page = 1, [FromQuery]int pageSize = 10, [FromQuery]string search = "")
     {
-        var items = await itemService.GetItems(page, pageSize);
+        var items = await itemService.GetItems(page, pageSize, search);
         return Ok(items);
     }
 
@@ -33,10 +33,10 @@ public class ItemsController(IItemService itemService) : ControllerBase
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemSummaryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<PaginatedResponseDto<ItemSummaryDto>>> 
-        GetItemSummaries([FromQuery]int page = 1, [FromQuery]int pageSize = 10)
+        GetItemSummaries([FromQuery]int page = 1, [FromQuery]int pageSize = 10, [FromQuery]string search = "")
     {
         var itemSummaries = await itemService
-            .GetItemSummaries(page, pageSize);
+            .GetItemSummaries(page, pageSize, search);
         return Ok(itemSummaries);
     }
 

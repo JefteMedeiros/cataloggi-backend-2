@@ -159,10 +159,13 @@ if (app.Environment.IsDevelopment()
     db.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(CorsPolicyName);
+
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
+
 app.UseSerilogRequestLogging();
 app.UseRateLimiter();
-app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 

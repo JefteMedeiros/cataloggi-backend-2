@@ -14,13 +14,13 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
 {
     private const int MaxCategoryNameLength = 64;
 
-    public async Task<PaginatedResponseDto<CategoryDto>> GetCategories(int page, int pageSize)
+    public async Task<PaginatedResponseDto<CategoryDto>> GetCategories(int page, int pageSize, string search)
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
         
-        var categories = await categoryRepository.GetCategories(page, pageSize);
-        var totalItems = await categoryRepository.CountCategories();
+        var categories = await categoryRepository.GetCategories(page, pageSize, search);
+        var totalItems = await categoryRepository.CountCategories(search);
 
         return new PaginatedResponseDto<CategoryDto>
         {

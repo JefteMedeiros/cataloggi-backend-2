@@ -8,13 +8,13 @@ namespace cataloggi_backend_2.Services;
 
 public class ItemService(IItemRepository itemRepository, ICategoryRepository categoryRepository) : IItemService
 {
-    public async Task<PaginatedResponseDto<ItemDto>> GetItems(int page, int pageSize)
+    public async Task<PaginatedResponseDto<ItemDto>> GetItems(int page, int pageSize, string search)
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var items = await itemRepository.GetItems(page, pageSize);
-        var totalItems = await itemRepository.CountItems();
+        var items = await itemRepository.GetItems(page, pageSize, search);
+        var totalItems = await itemRepository.CountItems(search);
 
         return new PaginatedResponseDto<ItemDto>
         {
@@ -26,13 +26,13 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
         };
     }
 
-    public async Task<PaginatedResponseDto<ItemSummaryDto>> GetItemSummaries(int page, int pageSize)
+    public async Task<PaginatedResponseDto<ItemSummaryDto>> GetItemSummaries(int page, int pageSize, string search)
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var items = await itemRepository.GetItems(page, pageSize);
-        var totalItems = await itemRepository.CountItems();
+        var items = await itemRepository.GetItems(page, pageSize, search);
+        var totalItems = await itemRepository.CountItems(search);
 
         return new PaginatedResponseDto<ItemSummaryDto>
         {

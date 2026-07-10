@@ -7,18 +7,38 @@ namespace cataloggi_backend_2.Repositories;
 
 public class ItemRepository(ApplicationDbContext context): IItemRepository
 {
-    public async Task<List<Item>> GetItems(int page, int pageSize)
+    public async Task<List<Item>> GetItems(int page, int pageSize, string search)
     {
-        return await context.Items
+        var query = context.Items.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.ToLower();
+            query = query.Where(i =>
+                i.Name.ToLower().Contains(normalizedSearch) ||
+                i.Content.ToLower().Contains(normalizedSearch));
+        }
+
+        return await query
             .OrderBy(i => i.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
     }
 
-    public async Task<int> CountItems()
+    public async Task<int> CountItems(string search)
     {
-        return await context.Items.CountAsync();
+        var query = context.Items.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.ToLower();
+            query = query.Where(i =>
+                i.Name.ToLower().Contains(normalizedSearch) ||
+                i.Content.ToLower().Contains(normalizedSearch));
+        }
+
+        return await query.CountAsync();
     }
     
     public async Task<Item?> GetItem(Guid id)
