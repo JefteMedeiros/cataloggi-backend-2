@@ -67,13 +67,35 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
 
     public async Task UpdateCategory(Category category)
     {
+        category.UpdatedAt = DateTime.UtcNow;
         context.Categories.Update(category);
         await context.SaveChangesAsync();
     }
 
     public async Task DeleteCategory(Category category)
     {
-        context.Categories.Remove(category);
+        category.DeletedAt = DateTime.UtcNow;
+        category.UpdatedAt = DateTime.UtcNow;
+        context.Categories.Update(category);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<List<Category>> GetCategoriesSince(DateTime since)
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-30);
+
+        return await context.Categories
+            .IgnoreQueryFilters()
+            .Where(c => c.UpdatedAt > since
+                || (c.DeletedAt != null && c.DeletedAt > cutoffDate))
+            .OrderBy(c => c.UpdatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<Category>> GetAllCategories()
+    {
+        return await context.Categories
+            .OrderBy(c => c.Name)
+            .ToListAsync();
     }
 }

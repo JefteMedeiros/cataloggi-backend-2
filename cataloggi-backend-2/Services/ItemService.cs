@@ -63,6 +63,7 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
             Name = name,
             FirstLetter = GetFirstLetter(name),
             Content = itemDto.Content,
+            CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
         
@@ -131,6 +132,7 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
             CategoryId = item.CategoryId,
             Name = item.Name,
             FirstLetter = item.FirstLetter,
+            CreatedAt = item.CreatedAt,
             UpdatedAt = item.UpdatedAt
         };
     }
@@ -144,6 +146,7 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
             Name = item.Name,
             FirstLetter = item.FirstLetter,
             Content = item.Content,
+            CreatedAt = item.CreatedAt,
             UpdatedAt = item.UpdatedAt,
         };
     }

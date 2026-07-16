@@ -10,4 +10,6 @@ public interface IItemRepository
     Task<Item> CreateItem(Item item);
     Task UpdateItem(Item item);
     Task DeleteItem(Item item);
+    Task<List<Item>> GetItemsSince(DateTime since);
+    Task<List<Item>> GetItemsByIds(List<Guid> ids);
 }

@@ -11,12 +11,12 @@ namespace cataloggi_backend_2.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/categories")]
+[Route("api")]
 [Produces("application/json")]
 [Tags("Categories")]
 public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("categories")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<CategoryDto>), StatusCodes.Status200OK)]
@@ -29,7 +29,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return Ok(categories);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("category/{id:guid}")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
@@ -48,7 +48,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         }
     }
 
-    [HttpPost]
+    [HttpPost("create-category")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -60,7 +60,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.Id }, createdCategory);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("update-category/{id:guid}")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -85,7 +85,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         }
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete-category/{id:guid}")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]

@@ -48,6 +48,8 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
             Id = Guid.NewGuid(),
             Name = name,
             Slug = slug,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
         
         var createdCategory = await categoryRepository.CreateCategory(category);

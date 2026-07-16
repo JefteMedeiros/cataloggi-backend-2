@@ -12,4 +12,6 @@ public interface ICategoryRepository
     Task<Category> CreateCategory(Category category);
     Task UpdateCategory(Category category);
     Task DeleteCategory(Category category);
+    Task<List<Category>> GetCategoriesSince(DateTime since);
+    Task<List<Category>> GetAllCategories();
 }

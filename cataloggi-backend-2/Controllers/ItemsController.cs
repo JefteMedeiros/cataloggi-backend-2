@@ -10,12 +10,12 @@ namespace cataloggi_backend_2.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/items")]
+[Route("api")]
 [Produces("application/json")]
 [Tags("Items")]
 public class ItemsController(IItemService itemService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("items")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemDto>), StatusCodes.Status200OK)]
@@ -27,7 +27,7 @@ public class ItemsController(IItemService itemService) : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("summaries")]
+    [HttpGet("item-summaries")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(PaginatedResponseDto<ItemSummaryDto>), StatusCodes.Status200OK)]
@@ -40,7 +40,7 @@ public class ItemsController(IItemService itemService) : ControllerBase
         return Ok(itemSummaries);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("item/{id:guid}")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimitPolicies.Read)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status200OK)]
@@ -59,7 +59,7 @@ public class ItemsController(IItemService itemService) : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("create-item")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -86,7 +86,7 @@ public class ItemsController(IItemService itemService) : ControllerBase
         }
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("update-item/{id:guid}")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(typeof(ItemDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -123,7 +123,7 @@ public class ItemsController(IItemService itemService) : ControllerBase
         }
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete-item/{id:guid}")]
     [EnableRateLimiting(RateLimitPolicies.Write)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]

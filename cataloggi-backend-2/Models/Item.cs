@@ -21,7 +21,9 @@ public class Item
     [StringLength(4000, MinimumLength = 1)]
     public string Content { get; set; } = string.Empty;
 
+    public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 
     public Category Category { get; set; } = null!;
 }

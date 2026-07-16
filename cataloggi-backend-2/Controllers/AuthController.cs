@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace cataloggi_backend_2.Controllers;
 
 [ApiController]
-[Route("api/auth")]
+[Route("api")]
 [Produces("application/json")]
 [Tags("Auth")]
 public class AuthController(IAuthService authService) : ControllerBase

@@ -22,5 +22,11 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Category>()
             .HasIndex(category => category.Slug)
             .IsUnique();
+
+        modelBuilder.Entity<Category>()
+            .HasQueryFilter(c => c.DeletedAt == null);
+
+        modelBuilder.Entity<Item>()
+            .HasQueryFilter(i => i.DeletedAt == null);
     }
 }

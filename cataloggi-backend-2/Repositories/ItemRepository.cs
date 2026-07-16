@@ -55,13 +55,35 @@ public class ItemRepository(ApplicationDbContext context): IItemRepository
 
     public async Task UpdateItem(Item item)
     {
+        item.UpdatedAt = DateTime.UtcNow;
         context.Items.Update(item);
         await context.SaveChangesAsync();
     }
 
     public async Task DeleteItem(Item item)
     {
-        context.Items.Remove(item);
+        item.DeletedAt = DateTime.UtcNow;
+        item.UpdatedAt = DateTime.UtcNow;
+        context.Items.Update(item);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<List<Item>> GetItemsSince(DateTime since)
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-30);
+
+        return await context.Items
+            .IgnoreQueryFilters()
+            .Where(i => i.UpdatedAt > since
+                || (i.DeletedAt != null && i.DeletedAt > cutoffDate))
+            .OrderBy(i => i.UpdatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<Item>> GetItemsByIds(List<Guid> ids)
+    {
+        return await context.Items
+            .Where(i => ids.Contains(i.Id))
+            .ToListAsync();
     }
 }
