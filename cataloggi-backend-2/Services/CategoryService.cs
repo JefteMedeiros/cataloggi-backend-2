@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using cataloggi_backend_2.DTOs;
 using cataloggi_backend_2.DTOs.Category;
 using cataloggi_backend_2.Exceptions;
+using cataloggi_backend_2.Helpers;
 using cataloggi_backend_2.Models;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services.Interfaces;
@@ -16,20 +17,12 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
 
     public async Task<PaginatedResponseDto<CategoryDto>> GetCategories(int page, int pageSize, string search)
     {
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, 100);
+        var (sanitizedPage, sanitizedPageSize) = PaginationHelper.Sanitize(page, pageSize);
         
-        var categories = await categoryRepository.GetCategories(page, pageSize, search);
+        var categories = await categoryRepository.GetCategories(sanitizedPage, sanitizedPageSize, search);
         var totalItems = await categoryRepository.CountCategories(search);
 
-        return new PaginatedResponseDto<CategoryDto>
-        {
-            Items = categories.Select(MapToDto).ToList(),
-            Page = page,
-            PageSize = pageSize,
-            TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
-        };
+        return PaginationHelper.BuildResponse(categories, MapToDto, sanitizedPage, sanitizedPageSize, totalItems);
     }
 
     public async Task<CategoryDto> GetCategory(Guid id)

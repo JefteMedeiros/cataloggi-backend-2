@@ -98,4 +98,39 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
             .OrderBy(c => c.Name)
             .ToListAsync();
     }
+
+    public async Task<(List<Category> Items, int TotalCount)> GetCategoriesSincePaged(DateTime since, int page, int pageSize)
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-30);
+
+        var query = context.Categories
+            .IgnoreQueryFilters()
+            .Where(c => c.UpdatedAt > since
+                || (c.DeletedAt != null && c.DeletedAt > cutoffDate));
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(c => c.UpdatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(List<Category> Items, int TotalCount)> GetAllCategoriesPaged(int page, int pageSize)
+    {
+        var query = context.Categories.AsQueryable();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(c => c.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }

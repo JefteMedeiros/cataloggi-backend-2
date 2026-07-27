@@ -14,4 +14,6 @@ public interface ICategoryRepository
     Task DeleteCategory(Category category);
     Task<List<Category>> GetCategoriesSince(DateTime since);
     Task<List<Category>> GetAllCategories();
+    Task<(List<Category> Items, int TotalCount)> GetCategoriesSincePaged(DateTime since, int page, int pageSize);
+    Task<(List<Category> Items, int TotalCount)> GetAllCategoriesPaged(int page, int pageSize);
 }

@@ -17,11 +17,13 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.Entity<Category>()
             .HasIndex(category => category.Name)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         modelBuilder.Entity<Category>()
             .HasIndex(category => category.Slug)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"DeletedAt\" IS NULL");
 
         modelBuilder.Entity<Category>()
             .HasQueryFilter(c => c.DeletedAt == null);

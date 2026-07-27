@@ -9,13 +9,17 @@ public class SyncService(
     ICategoryRepository categoryRepository,
     IItemRepository itemRepository) : ISyncService
 {
-    public async Task<CategorySyncResponseDto> SyncCategories(DateTime? since)
+    public async Task<CategorySyncResponseDto> SyncCategories(DateTime? since, int page, int pageSize)
     {
-        var categories = since.HasValue
-            ? await categoryRepository.GetCategoriesSince(since.Value)
-            : await categoryRepository.GetAllCategories();
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 1000);
+
+        var (categories, totalCount) = since.HasValue
+            ? await categoryRepository.GetCategoriesSincePaged(since.Value, page, pageSize)
+            : await categoryRepository.GetAllCategoriesPaged(page, pageSize);
 
         var syncedAt = DateTime.UtcNow;
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
         var updated = categories
             .Where(c => c.DeletedAt == null)
@@ -38,17 +42,25 @@ public class SyncService(
         {
             Updated = updated,
             Deleted = deleted,
-            SyncedAt = syncedAt
+            SyncedAt = syncedAt,
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages,
+            TotalItems = totalCount
         };
     }
 
-    public async Task<ItemSyncResponseDto> SyncItems(DateTime? since)
+    public async Task<ItemSyncResponseDto> SyncItems(DateTime? since, int page, int pageSize)
     {
-        var items = since.HasValue
-            ? await itemRepository.GetItemsSince(since.Value)
-            : await itemRepository.GetItemsByIds([]);
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 1000);
+
+        var (items, totalCount) = since.HasValue
+            ? await itemRepository.GetItemsSincePaged(since.Value, page, pageSize)
+            : await itemRepository.GetItemsSincePaged(DateTime.MinValue, page, pageSize);
 
         var syncedAt = DateTime.UtcNow;
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
         var updated = items
             .Where(i => i.DeletedAt == null)
@@ -72,7 +84,11 @@ public class SyncService(
         {
             Updated = updated,
             Deleted = deleted,
-            SyncedAt = syncedAt
+            SyncedAt = syncedAt,
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages,
+            TotalItems = totalCount
         };
     }
 

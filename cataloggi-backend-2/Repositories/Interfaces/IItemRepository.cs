@@ -12,4 +12,5 @@ public interface IItemRepository
     Task DeleteItem(Item item);
     Task<List<Item>> GetItemsSince(DateTime since);
     Task<List<Item>> GetItemsByIds(List<Guid> ids);
+    Task<(List<Item> Items, int TotalCount)> GetItemsSincePaged(DateTime since, int page, int pageSize);
 }

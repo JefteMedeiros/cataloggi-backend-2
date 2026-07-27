@@ -21,9 +21,11 @@ public class SyncController(ISyncService syncService) : ControllerBase
     [ProducesResponseType(typeof(CategorySyncResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<CategorySyncResponseDto>> SyncCategories(
-        [FromQuery] DateTime? since = null)
+        [FromQuery] DateTime? since = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 500)
     {
-        var result = await syncService.SyncCategories(since);
+        var result = await syncService.SyncCategories(since, page, pageSize);
         return Ok(result);
     }
 
@@ -33,9 +35,11 @@ public class SyncController(ISyncService syncService) : ControllerBase
     [ProducesResponseType(typeof(ItemSyncResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<ItemSyncResponseDto>> SyncItems(
-        [FromQuery] DateTime? since = null)
+        [FromQuery] DateTime? since = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 500)
     {
-        var result = await syncService.SyncItems(since);
+        var result = await syncService.SyncItems(since, page, pageSize);
         return Ok(result);
     }
 
@@ -51,8 +55,8 @@ public class SyncController(ISyncService syncService) : ControllerBase
         if (request.Ids is null || request.Ids.Count == 0)
             return ValidationProblem("At least one item ID is required.");
 
-        if (request.Ids.Count > 100)
-            return ValidationProblem("Maximum 100 items per batch request.");
+        if (request.Ids.Count > 500)
+            return ValidationProblem("Maximum 500 items per batch request.");
 
         var items = await syncService.GetItemsByIds(request.Ids);
         return Ok(items);

@@ -1,5 +1,6 @@
 using cataloggi_backend_2.DTOs;
 using cataloggi_backend_2.Exceptions;
+using cataloggi_backend_2.Helpers;
 using cataloggi_backend_2.Models;
 using cataloggi_backend_2.Repositories.Interfaces;
 using cataloggi_backend_2.Services.Interfaces;
@@ -10,38 +11,22 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
 {
     public async Task<PaginatedResponseDto<ItemDto>> GetItems(int page, int pageSize, string search)
     {
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, 100);
+        var (sanitizedPage, sanitizedPageSize) = PaginationHelper.Sanitize(page, pageSize);
 
-        var items = await itemRepository.GetItems(page, pageSize, search);
+        var items = await itemRepository.GetItems(sanitizedPage, sanitizedPageSize, search);
         var totalItems = await itemRepository.CountItems(search);
 
-        return new PaginatedResponseDto<ItemDto>
-        {
-            Items = items.Select(MapToDto).ToList(),
-            Page = page,
-            PageSize = pageSize,
-            TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
-        };
+        return PaginationHelper.BuildResponse(items, MapToDto, sanitizedPage, sanitizedPageSize, totalItems);
     }
 
     public async Task<PaginatedResponseDto<ItemSummaryDto>> GetItemSummaries(int page, int pageSize, string search)
     {
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, 100);
+        var (sanitizedPage, sanitizedPageSize) = PaginationHelper.Sanitize(page, pageSize);
 
-        var items = await itemRepository.GetItems(page, pageSize, search);
+        var items = await itemRepository.GetItems(sanitizedPage, sanitizedPageSize, search);
         var totalItems = await itemRepository.CountItems(search);
 
-        return new PaginatedResponseDto<ItemSummaryDto>
-        {
-            Items = items.Select(MapToSummaryDto).ToList(),
-            Page = page,
-            PageSize = pageSize,
-            TotalItems = totalItems,
-            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
-        };
+        return PaginationHelper.BuildResponse(items, MapToSummaryDto, sanitizedPage, sanitizedPageSize, totalItems);
     }
 
     public async Task<ItemDto> GetItem(Guid id)
@@ -82,16 +67,17 @@ public class ItemService(IItemRepository itemRepository, ICategoryRepository cat
         await EnsureCategoryExists(itemDto.CategoryId);
 
         var name = itemDto.Name.Trim();
+        var content = itemDto.Content ?? itemToEdit.Content;
         
         if (itemToEdit.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)
             && itemToEdit.CategoryId == itemDto.CategoryId
-            && itemToEdit.Content.Equals(itemDto.Content, StringComparison.InvariantCultureIgnoreCase))
+            && itemToEdit.Content.Equals(content, StringComparison.InvariantCultureIgnoreCase))
             throw new ConflictException("Item data must be different from the current data.");
         
         itemToEdit.CategoryId = itemDto.CategoryId;
         itemToEdit.Name = name;
         itemToEdit.FirstLetter = GetFirstLetter(name);
-        itemToEdit.Content = itemDto.Content;
+        itemToEdit.Content = content;
         itemToEdit.UpdatedAt = DateTime.UtcNow;
         
         await itemRepository.UpdateItem(itemToEdit);

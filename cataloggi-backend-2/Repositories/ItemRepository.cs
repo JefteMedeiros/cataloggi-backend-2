@@ -86,4 +86,24 @@ public class ItemRepository(ApplicationDbContext context): IItemRepository
             .Where(i => ids.Contains(i.Id))
             .ToListAsync();
     }
+
+    public async Task<(List<Item> Items, int TotalCount)> GetItemsSincePaged(DateTime since, int page, int pageSize)
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-30);
+
+        var query = context.Items
+            .IgnoreQueryFilters()
+            .Where(i => i.UpdatedAt > since
+                || (i.DeletedAt != null && i.DeletedAt > cutoffDate));
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(i => i.UpdatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }
