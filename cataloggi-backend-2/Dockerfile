@@ -3,11 +3,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["cataloggi-backend-2.csproj", "./"]
-RUN dotnet restore "cataloggi-backend-2.csproj"
+COPY ["cataloggi-backend-2/cataloggi-backend-2.csproj", "cataloggi-backend-2/"]
+RUN dotnet restore "cataloggi-backend-2/cataloggi-backend-2.csproj"
 
-COPY . .
-RUN dotnet publish "cataloggi-backend-2.csproj" \
+COPY . ./cataloggi-backend-2/
+RUN dotnet publish "cataloggi-backend-2/cataloggi-backend-2.csproj" \
     --configuration Release \
     --output /app/publish \
     /p:UseAppHost=false
