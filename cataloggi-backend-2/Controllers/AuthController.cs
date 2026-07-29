@@ -15,7 +15,7 @@ public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]
     [AllowAnonymous]
-    [EnableRateLimiting(RateLimitPolicies.Write)]
+    [EnableRateLimiting(RateLimitPolicies.Login)]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
